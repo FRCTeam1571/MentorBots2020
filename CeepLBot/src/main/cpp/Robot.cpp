@@ -8,23 +8,51 @@
 #include <frc/Joystick.h>
 #include <frc/PWMVictorSPX.h>
 #include <frc/TimedRobot.h>
+#include <frc/Timer.h>
 #include <frc/drive/DifferentialDrive.h>
+#include <frc/livewindow/LiveWindow.h>
 
-/**
- * This is a demo program showing the use of the DifferentialDrive class.
- * Runs the motors with arcade steering.
- */
 class Robot : public frc::TimedRobot {
-  frc::PWMVictorSPX m_leftMotor{0};
-  frc::PWMVictorSPX m_rightMotor{1};
-  frc::DifferentialDrive m_robotDrive{m_leftMotor, m_rightMotor};
-  frc::Joystick m_stick{0};
-
  public:
-  void TeleopPeriodic() {
-    // Drive with arcade style
+  Robot() {
+    m_robotDrive.SetExpiration(0.1);
+    m_timer.Start();
+  }
+
+  void AutonomousInit() override {
+    m_timer.Reset();
+    m_timer.Start();
+  }
+
+  void AutonomousPeriodic() override {
+    // Drive for 2 seconds
+    if (m_timer.Get() < 2.0) {
+      // Drive forwards half speed
+      m_robotDrive.ArcadeDrive(-0.5, 0.0);
+    } else {
+      // Stop robot
+      m_robotDrive.ArcadeDrive(0.0, 0.0);
+    }
+  }
+
+  void TeleopInit() override {}
+
+  void TeleopPeriodic() override {
+    // Drive with arcade style (use right stick)
     m_robotDrive.ArcadeDrive(m_stick.GetY(), m_stick.GetX());
   }
+
+  void TestPeriodic() override {}
+
+ private:
+  // Robot drive system
+  frc::PWMVictorSPX m_left{0};
+  frc::PWMVictorSPX m_right{1};
+  frc::DifferentialDrive m_robotDrive{m_left, m_right};
+
+  frc::Joystick m_stick{0};
+  frc::LiveWindow& m_lw = *frc::LiveWindow::GetInstance();
+  frc::Timer m_timer;
 };
 
 #ifndef RUNNING_FRC_TESTS
