@@ -1,59 +1,70 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2017-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include <frc/Joystick.h>
-#include <frc/PWMVictorSPX.h>
-#include <frc/TimedRobot.h>
-#include <frc/Timer.h>
-#include <frc/drive/DifferentialDrive.h>
-#include <frc/livewindow/LiveWindow.h>
+#include "Robot.h"
 
-class Robot : public frc::TimedRobot {
- public:
-  Robot() {
-    m_robotDrive.SetExpiration(0.1);
-    m_timer.Start();
+#include <frc/smartdashboard/SmartDashboard.h>
+#include <frc2/command/CommandScheduler.h>
+
+void Robot::RobotInit() {}
+
+/**
+ * This function is called every robot packet, no matter the mode. Use
+ * this for items like diagnostics that you want to run during disabled,
+ * autonomous, teleoperated and test.
+ *
+ * <p> This runs after the mode specific periodic functions, but before
+ * LiveWindow and SmartDashboard integrated updating.
+ */
+void Robot::RobotPeriodic() { frc2::CommandScheduler::GetInstance().Run(); }
+
+/**
+ * This function is called once each time the robot enters Disabled mode. You
+ * can use it to reset any subsystem information you want to clear when the
+ * robot is disabled.
+ */
+void Robot::DisabledInit() {}
+
+void Robot::DisabledPeriodic() {}
+
+/**
+ * This autonomous runs the autonomous command selected by your {@link
+ * RobotContainer} class.
+ */
+void Robot::AutonomousInit() {
+  m_autonomousCommand = m_container.GetAutonomousCommand();
+
+  if (m_autonomousCommand != nullptr) {
+    m_autonomousCommand->Schedule();
   }
+}
 
-  void AutonomousInit() override {
-    m_timer.Reset();
-    m_timer.Start();
+void Robot::AutonomousPeriodic() {}
+
+void Robot::TeleopInit() {
+  // This makes sure that the autonomous stops running when
+  // teleop starts running. If you want the autonomous to
+  // continue until interrupted by another command, remove
+  // this line or comment it out.
+  if (m_autonomousCommand != nullptr) {
+    m_autonomousCommand->Cancel();
+    m_autonomousCommand = nullptr;
   }
+}
 
-  void AutonomousPeriodic() override {
-    // Drive for 2 seconds
-    if (m_timer.Get() < 2.0) {
-      // Drive forwards half speed
-      m_robotDrive.ArcadeDrive(-0.5, 0.0);
-    } else {
-      // Stop robot
-      m_robotDrive.ArcadeDrive(0.0, 0.0);
-    }
-  }
+/**
+ * This function is called periodically during operator control.
+ */
+void Robot::TeleopPeriodic() {}
 
-  void TeleopInit() override {}
-
-  void TeleopPeriodic() override {
-    // Drive with arcade style (use right stick)
-    m_robotDrive.ArcadeDrive(m_stick.GetY(), m_stick.GetX());
-  }
-
-  void TestPeriodic() override {}
-
- private:
-  // Robot drive system
-  frc::PWMVictorSPX m_left{0};
-  frc::PWMVictorSPX m_right{1};
-  frc::DifferentialDrive m_robotDrive{m_left, m_right};
-
-  frc::Joystick m_stick{0};
-  frc::LiveWindow& m_lw = *frc::LiveWindow::GetInstance();
-  frc::Timer m_timer;
-};
+/**
+ * This function is called periodically during test mode.
+ */
+void Robot::TestPeriodic() {}
 
 #ifndef RUNNING_FRC_TESTS
 int main() { return frc::StartRobot<Robot>(); }
