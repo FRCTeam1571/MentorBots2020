@@ -1,3 +1,8 @@
 {
-    "python.pythonPath": "C:\\Users\\seth.urbach\\Documents\\Pythons\\frc2020\\Scripts\\python.exe"
+    "python.pythonPath": "C:\\Users\\seth.urbach\\Documents\\Pythons\\frc2020\\Scripts\\python.exe",
+    "python.venvPath": "C:\\Users\\seth.urbach\\Documents\\Pythons\\",
+    "python.terminal.launchArgs": ["-m", "robot", "sim", "#"],
+    "python.terminal.executeInFileDir":	true,
+    "code-runner.executorMap": { "python": "${config:python.pythonPath} -3 $fullFileName test" }
+
 }

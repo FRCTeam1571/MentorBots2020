@@ -1,0 +1,60 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "deploy with netconsole",
+            "type": "process",
+            "group": "build",
+            "command": "${config:python.pythonPath}",
+            "args": [
+                "robot.py",
+                "deploy",
+                "--nc"
+            ]
+        },
+        {
+            "label": "deploy",
+            "type": "process",
+            "group": "build",
+            "command": "${config:python.pythonPath}",
+            "args": [
+                "robot.py",
+                "deploy"
+            ]
+        },
+        {
+            "label": "test",
+            "type": "process",
+            "group": {
+                "kind": "test",
+                "isDefault": true
+            },
+            "command": "${config:python.pythonPath}",
+            "args": [
+                "robot.py",
+                "test"
+            ]
+        },
+        {
+            "label": "Run python with argument",
+            "type": "shell",
+            "command": "${config:python.pythonPath} ${workspaceFolder}/Source/Robot.py sim",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "Run python with commands",
+            "type": "shell",
+            "command": "${config:python.pythonPath} ${file} sim",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        }
+        
+    ]
+}

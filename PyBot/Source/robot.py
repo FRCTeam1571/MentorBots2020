@@ -6,33 +6,57 @@
 """
 
 import wpilib
+from wpilib.drive import DifferentialDrive
+import ptvsd
 
 
-class MyRobot(wpilib.IterativeRobot):
+class MyRobot(wpilib.TimedRobot):
     def robotInit(self):
         """Robot initialization function"""
 
+        self.frontLeft = wpilib.Spark(1)
+        self.rearLeft = wpilib.Spark(2)
+        self.left = wpilib.SpeedControllerGroup(self.frontLeft, self.rearLeft)
+
+        self.frontRight = wpilib.Spark(3)
+        self.rearRight = wpilib.Spark(4)
+        self.right = wpilib.SpeedControllerGroup(self.frontRight, self.rearRight)
+
+        self.drive = DifferentialDrive(self.left, self.right)
         # object that handles basic drive operations
-        self.myRobot = wpilib.RobotDrive(0, 1)
-        self.myRobot.setExpiration(0.1)
+        #self.myRobot = wpilib.Drive.DifferentialDrive(0, 1)
+        #self.myRobot.setExpiration(0.1)
 
         # joystick #0
         self.stick = wpilib.Joystick(0)
 
+    def disabledInit(self):
+        self.drive.setSafetyEnabled(False)
+    def disabledPeriodic(self):
+        self.drive.setSafetyEnabled(False)
+    def robotPeriodic(self):
+        self.drive.setSafetyEnabled(False)
+
+    def testInit(self):
+        print("Test Init")
+    def testPeriodic(self):
+        if(self.stick.getRawButtonPressed(1) == True):
+            print("Test Button 1 Pressed.")
+
     def autonomousInit(self):
-        self.myRobot.setSafetyEnabled(True)
+        self.drive.setSafetyEnabled(False)
 
     def autonomousPeriodic(self):
         """Called when autonomous mode is enabled"""
 
         while self.isAutonomous() and self.isEnabled():
-            wpilib.Timer.delay(0.01)
-            self.myRobot.arcadeDrive(self.stick, True)
+            #wpilib.Timer.delay(0.01)
+            self.drive.arcadeDrive(0.20, 0.1)
 
     def teleopInit(self):
         """Executed at the start of teleop mode"""
         
-        self.myRobot.setSafetyEnabled(True)
+        self.drive.setSafetyEnabled(False)
 
     def teleopPeriodic(self):
         """Runs the motors with tank steering"""
@@ -42,12 +66,23 @@ class MyRobot(wpilib.IterativeRobot):
 
         while self.isOperatorControl() and self.isEnabled():
             # Move a motor with a Joystick
-            self.myRobot.arcadeDrive(0.20, 0.1)
-            wpilib.Timer.delay(0.02)
+            #wpilib.Timer.delay(0.02)
+            self.drive.arcadeDrive(self.stick.getRawButton(1), True)
 
+
+# if __name__ == "__main__":
+#     wpilib.run(MyRobot)
 
 if __name__ == "__main__":
+    # Allow other computers to attach to ptvsd at this IP address and port.
+    #ptvsd.enable_attach(address=('10.15.71.2', 22), redirect_output=True)
+    # Pause the program until a remote debugger is attached
+    #ptvsd.wait_for_attach()
+
     wpilib.run(MyRobot)
+
+
+
 
 
 #!/usr/bin/env python3
